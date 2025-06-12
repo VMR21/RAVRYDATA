@@ -33,7 +33,6 @@ function getDynamicApiUrl() {
   const start = now < thisMonth19 ? new Date(Date.UTC(year, month - 1, 19)) : thisMonth19;
   const end = now < thisMonth19 ? thisMonth19 : nextMonth19;
 
-  // Save for frontend display
   periodRange.start = start.toISOString().slice(0, 10);
   periodRange.end = end.toISOString().slice(0, 10);
 
@@ -51,7 +50,7 @@ async function fetchAndCacheData() {
     );
 
     const top10 = sorted.slice(0, 10);
-    if (top10.length >= 2) [top10[0], top10[1]] = [top10[1], top10[0]];
+    if (top10.length >= 2) [top10[0], top10[1]] = [top10[1], top10[0]]; // switch top 2
 
     cachedData = top10.map(entry => ({
       username: maskUsername(entry.username),
@@ -68,11 +67,9 @@ async function fetchAndCacheData() {
 fetchAndCacheData();
 setInterval(fetchAndCacheData, 5 * 60 * 1000); // every 5 minutes
 
+// 🟢 Now returns only raw array like you wanted
 app.get("/leaderboard/top14", (req, res) => {
-  res.json({
-    period: `${periodRange.start} → ${periodRange.end}`,
-    data: cachedData,
-  });
+  res.json(cachedData);
 });
 
 setInterval(() => {
